@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "919997515366",
-    "project_id": "asnanhub-d4902",
-    "storage_bucket": "asnanhub-d4902.firebasestorage.app"
+    "project_number": "895926008499",
+    "project_id": "asnan-hub",
+    "storage_bucket": "asnan-hub.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:919997515366:android:e7422b7dbc01434dd88fa7",
+        "mobilesdk_app_id": "1:895926008499:android:06e11cac3a1e6b76ff8ec6",
         "android_client_info": {
           "package_name": "com.example.asnan_hub"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDxLCCu590H2iQWPNTgNFx9NtEAyGssjyY"
+          "current_key": "AIzaSyCSW4NbqDXmCO31VzHzOc3OUH2h3m4uvXA"
         }
       ],
       "services": {

@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCJn0BHvKlfwNmWlFO-kcHoP24CIluUX0g',
-    appId: '1:919997515366:web:d12f6e1386e46bd1d88fa7',
-    messagingSenderId: '919997515366',
-    projectId: 'asnanhub-d4902',
-    authDomain: 'asnanhub-d4902.firebaseapp.com',
-    storageBucket: 'asnanhub-d4902.firebasestorage.app',
-    measurementId: 'G-GKKWX2YF1Y',
+    apiKey: 'AIzaSyCXfOvXcvzDmHZGjxoE2_ABsBPGlmTf0-w',
+    appId: '1:895926008499:web:1263e4d35b712c76ff8ec6',
+    messagingSenderId: '895926008499',
+    projectId: 'asnan-hub',
+    authDomain: 'asnan-hub.firebaseapp.com',
+    storageBucket: 'asnan-hub.firebasestorage.app',
+    measurementId: 'G-7KG505EJ3K',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDxLCCu590H2iQWPNTgNFx9NtEAyGssjyY',
-    appId: '1:919997515366:android:e7422b7dbc01434dd88fa7',
-    messagingSenderId: '919997515366',
-    projectId: 'asnanhub-d4902',
-    storageBucket: 'asnanhub-d4902.firebasestorage.app',
+    apiKey: 'AIzaSyCSW4NbqDXmCO31VzHzOc3OUH2h3m4uvXA',
+    appId: '1:895926008499:android:06e11cac3a1e6b76ff8ec6',
+    messagingSenderId: '895926008499',
+    projectId: 'asnan-hub',
+    storageBucket: 'asnan-hub.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBjr91DwebVYiXSKIxnJeQait_ARqK1dJE',
-    appId: '1:919997515366:ios:b374a1d38c5d8ef4d88fa7',
-    messagingSenderId: '919997515366',
-    projectId: 'asnanhub-d4902',
-    storageBucket: 'asnanhub-d4902.firebasestorage.app',
+    apiKey: 'AIzaSyCxILOqR-cnykOj8EQxmB3mHDbt2YZfhME',
+    appId: '1:895926008499:ios:595eb57bca235068ff8ec6',
+    messagingSenderId: '895926008499',
+    projectId: 'asnan-hub',
+    storageBucket: 'asnan-hub.firebasestorage.app',
     iosBundleId: 'com.example.asnanHub',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBjr91DwebVYiXSKIxnJeQait_ARqK1dJE',
-    appId: '1:919997515366:ios:b374a1d38c5d8ef4d88fa7',
-    messagingSenderId: '919997515366',
-    projectId: 'asnanhub-d4902',
-    storageBucket: 'asnanhub-d4902.firebasestorage.app',
+    apiKey: 'AIzaSyCxILOqR-cnykOj8EQxmB3mHDbt2YZfhME',
+    appId: '1:895926008499:ios:595eb57bca235068ff8ec6',
+    messagingSenderId: '895926008499',
+    projectId: 'asnan-hub',
+    storageBucket: 'asnan-hub.firebasestorage.app',
     iosBundleId: 'com.example.asnanHub',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCJn0BHvKlfwNmWlFO-kcHoP24CIluUX0g',
-    appId: '1:919997515366:web:770a7a12aaf97263d88fa7',
-    messagingSenderId: '919997515366',
-    projectId: 'asnanhub-d4902',
-    authDomain: 'asnanhub-d4902.firebaseapp.com',
-    storageBucket: 'asnanhub-d4902.firebasestorage.app',
-    measurementId: 'G-BJCKHXLPDS',
+    apiKey: 'AIzaSyCXfOvXcvzDmHZGjxoE2_ABsBPGlmTf0-w',
+    appId: '1:895926008499:web:64a76ef877db9bcfff8ec6',
+    messagingSenderId: '895926008499',
+    projectId: 'asnan-hub',
+    authDomain: 'asnan-hub.firebaseapp.com',
+    storageBucket: 'asnan-hub.firebasestorage.app',
+    measurementId: 'G-46J6SP65XS',
   );
+
 }

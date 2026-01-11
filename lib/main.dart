@@ -1,4 +1,5 @@
 
+import 'package:asnan_hub/pages/auth/auth_gate.dart';
 import 'package:asnan_hub/pages/auth/login.dart';
 import 'package:asnan_hub/theme/theme_data.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AsnanHub',
       theme: asnanTheme,
-      home: const Login(),
+      
+      home: const AuthGate(),
     );
   }
 }
