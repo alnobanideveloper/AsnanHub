@@ -3,7 +3,6 @@ class UserModel {
   final String name;
   final String email;
   final String phone;
-  final String universityId;
   final String gender;
 
   UserModel({
@@ -11,7 +10,6 @@ class UserModel {
     required this.name,
     required this.email,
     required this.phone,
-    required this.universityId,
     required this.gender,
   });
 
@@ -22,7 +20,6 @@ class UserModel {
       'name': name,
       'email': email,
       'phone': phone,
-      'universityId': universityId,
       'gender': gender,
     };
   }
@@ -34,7 +31,6 @@ class UserModel {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       phone: map['phone'] ?? '',
-      universityId: map['universityId'] ?? '',
       gender: map['gender'] ?? '',
     );
   }

@@ -1,17 +1,40 @@
 import 'package:asnan_hub/extensions/snackbar_extension.dart';
+import 'package:asnan_hub/models/user_role.dart';
+import 'package:asnan_hub/pages/doctor/doctor_main.dart';
 import 'package:asnan_hub/pages/patient/patient_main.dart';
 import 'package:asnan_hub/pages/auth/signup.dart';
 import 'package:asnan_hub/services/auth_serrvice.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  final UserRole? role;
+
+  const Login({super.key, this.role});
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  Future<UserRole?> _getUserRole() async {
+    final authService = AuthService();
+
+    // First check if user is a student
+    final studentProfile = await authService.getStudentProfile();
+    if (studentProfile != null) {
+      return UserRole.student; // User is a student
+    }
+
+    // If not a student, check if user is a patient
+    final patientProfile = await authService.getUserProfile();
+    if (patientProfile != null) {
+      return UserRole.patient; // User is a patient
+    }
+
+    // If neither found, default to patient (shouldn't happen in normal flow)
+    return null;
+  }
+
   var authService = AuthService();
   bool _isLoading = false;
 
@@ -27,21 +50,36 @@ class _LoginState extends State<Login> {
         emailController.text.trim(),
         passwordController.text,
       );
-      
+
       if (!mounted) return; // Check if widget is still mounted
-      
-      print("Login successful: ${userCredentials.user?.email}");
+
+      UserRole? userRole = await _getUserRole();
+
+      if (userRole == null) {
+        return;
+      }
+      //check if the users role is same as selected role
+      if (widget.role != userRole) {
+        context.showErrorSnackBar(
+          "role mismatch , you cant access this role!!",
+          Colors.red,
+        );
+        return;
+      }
+      if (userRole == UserRole.patient) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => StudentMainPage()),
+        );
+      }
 
       context.showErrorSnackBar("Login successful", Colors.green);
-
-      // Navigate to main page immediately (AuthGate will also handle this, but this provides immediate feedback)
-      // Using pushReplacement so user can't go back to login page
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
     } catch (ex) {
       if (!mounted) return; // Check if widget is still mounted
-      
+
       String errorMessage = 'Login failed. Please try again.';
       if (ex is String) {
         errorMessage = ex;
@@ -102,7 +140,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-          
+
               SizedBox(height: 20),
               Text(
                 "AsnanHub",
@@ -116,9 +154,33 @@ class _LoginState extends State<Login> {
                 "connecting patients with students...",
                 style: Theme.of(context).textTheme.labelLarge,
               ),
-          
+
               SizedBox(height: 50),
               Text("Login", style: Theme.of(context).textTheme.headlineMedium),
+              if (widget.role != null) ...[
+                SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(widget.role!.icon, size: 16, color: scheme.primary),
+                      SizedBox(width: 6),
+                      Text(
+                        widget.role!.label,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               SizedBox(height: 20),
               //Signup section
               TextFormField(
@@ -131,7 +193,7 @@ class _LoginState extends State<Login> {
                 obscureText: true,
                 decoration: InputDecoration(labelText: "Password"),
               ),
-          
+
               SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
@@ -151,16 +213,18 @@ class _LoginState extends State<Login> {
                       : const Text("Login"),
                 ),
               ),
-          
+
               SizedBox(height: 8),
               Row(
                 children: [
                   Text("dont have an account ? "),
                   InkWell(
                     onTap: () {
-                      Navigator.of(
-                        context,
-                      ).push(MaterialPageRoute(builder: (builder) => Signup()));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (builder) => Signup(role: widget.role),
+                        ),
+                      );
                     },
                     child: Text(
                       "Register",

@@ -1,3 +1,4 @@
+import 'package:asnan_hub/models/students.dart';
 import 'package:asnan_hub/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,7 +14,6 @@ Future<UserModel?> getUserProfile() async {
   String? uid = FirebaseAuth.instance.currentUser?.uid;
 
   if (uid == null) {
-    print("No user logged in");
     return null; // User not logged in
   }
 
@@ -26,16 +26,40 @@ Future<UserModel?> getUserProfile() async {
     if (userDoc.exists && userDoc.data() != null) {
       // Access fields using data() method which returns Map<String, dynamic>?
       final data = userDoc.data() as Map<String, dynamic>;
-      print("user doc exists , ${data}");
+  
       var user = UserModel.fromMap(data);
-      print(user.email);
       return UserModel.fromMap(data);
     } else {
-      print("User document does not exist in Firestore for uid: $uid");
       return null;
     }
   } catch (e) {
-    print("Error fetching user data: $e");
+    return null;
+  }
+}
+Future<StudentUser?> getStudentProfile() async {
+  String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+  //if the user is not logged in
+  if (uid == null) {
+    return null; 
+  }
+
+  try {
+    // 2. Fetch the document from the 'students' collection
+    DocumentSnapshot userDoc = 
+        await FirebaseFirestore.instance.collection('students').doc(uid).get();
+
+    // 3. Check if it exists and read data
+    if (userDoc.exists && userDoc.data() != null) {
+      // Access fields using data() method which returns Map<String, dynamic>?
+      final data = userDoc.data() as Map<String, dynamic>;
+  
+      var user = StudentUser.fromMap(data);
+      return user;
+    } else {
+      return null;
+    }
+  } catch (e) {
     return null;
   }
 }

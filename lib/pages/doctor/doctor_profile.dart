@@ -1,34 +1,47 @@
+import 'package:asnan_hub/models/students.dart';
 import 'package:asnan_hub/models/user.dart';
 import 'package:asnan_hub/services/auth_serrvice.dart';
 import 'package:asnan_hub/widgets/profile_header.dart';
 import 'package:asnan_hub/widgets/profile_info_card.dart';
+import 'package:asnan_hub/widgets/student_profile_info_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class MyProfile extends StatefulWidget {
-  const MyProfile({super.key});
+class DoctorProfile extends StatefulWidget {
+  const DoctorProfile({super.key});
 
   @override
-  State<MyProfile> createState() => _MyProfileState();
+  State<DoctorProfile> createState() => _DoctorProfileState();
 }
 
-class _MyProfileState extends State<MyProfile> {
-  UserModel? user;
+class _DoctorProfileState extends State<DoctorProfile> {
+  StudentUser? studentUser;
+  UserModel? patientUser;
   var authService = AuthService();
   bool loading = false;
+  bool isStudent = true; // Default to student, will check both
 
   @override
   void initState() {
     super.initState();
-    _fetchUser();
+    _fetchProfile();
   }
 
-  Future<void> _fetchUser() async {
+  Future<void> _fetchProfile() async {
     setState(() => loading = true);
     try {
-      user = await authService.getUserProfile();
+      // First try to fetch student profile
+      studentUser = await authService.getStudentProfile();
+      
+      // If not a student, try to fetch patient profile
+      if (studentUser == null) {
+        patientUser = await authService.getUserProfile();
+        isStudent = false;
+      } else {
+        isStudent = true;
+      }
     } catch (e) {
-      print("Error fetching user: $e");
+      print("Error fetching profile: $e");
     } finally {
       if (mounted) {
         setState(() => loading = false);
@@ -66,10 +79,12 @@ class _MyProfileState extends State<MyProfile> {
     var theme = Theme.of(context);
 
     if (loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
-    if (user == null) {
+    if (studentUser == null && patientUser == null) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -77,32 +92,37 @@ class _MyProfileState extends State<MyProfile> {
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Profile not found', style: theme.textTheme.titleLarge),
+              Text(
+                'Profile not found',
+                style: theme.textTheme.titleLarge,
+              ),
               const SizedBox(height: 8),
               Text(
                 'Please make sure you have completed your profile',
                 style: theme.textTheme.bodyMedium,
               ),
-              SizedBox(height: 10),
-              // Sign Out Button
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _handleSignOut,
-                    icon: const Icon(Icons.logout),
-                    label: const Text('Sign Out'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
-                ),
-              ),
             ],
+          ),
+        ),
+      );
+    }
+
+    // Determine which profile to show
+    final String name;
+    final String email;
+
+    if (isStudent && studentUser != null) {
+      name = studentUser!.name;
+      email = studentUser!.email;
+    } else if (patientUser != null) {
+      name = patientUser!.name;
+      email = patientUser!.email;
+    } else {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Profile data unavailable',
+            style: theme.textTheme.titleLarge,
           ),
         ),
       );
@@ -113,12 +133,19 @@ class _MyProfileState extends State<MyProfile> {
         child: Column(
           children: [
             // Profile Header
-            ProfileHeader(name: user!.name, email: user!.email),
+            ProfileHeader(
+              name: name,
+              email: email,
+            ),
 
             // Profile Information
             Padding(
               padding: const EdgeInsets.all(20),
-              child: ProfileInfoCard(user: user!),
+              child: isStudent && studentUser != null
+                  ? StudentProfileInfoCard(user: studentUser!)
+                  : patientUser != null
+                      ? ProfileInfoCard(user: patientUser!)
+                      : const SizedBox.shrink(),
             ),
 
             // Sign Out Button
@@ -143,3 +170,4 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 }
+

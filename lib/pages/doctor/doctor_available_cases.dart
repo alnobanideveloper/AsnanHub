@@ -1,21 +1,19 @@
-import 'package:asnan_hub/extensions/snackbar_extension.dart';
 import 'package:asnan_hub/models/case.dart';
-import 'package:asnan_hub/models/user.dart';
-import 'package:asnan_hub/pages/patient/patient_edit_case.dart';
+import 'package:asnan_hub/models/students.dart';
 import 'package:asnan_hub/services/auth_serrvice.dart';
 import 'package:asnan_hub/widgets/case_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class MyCases extends StatefulWidget {
-  const MyCases({super.key});
+class DoctorAvailableCases extends StatefulWidget {
+  const DoctorAvailableCases({super.key});
 
   @override
-  State<MyCases> createState() => _MyCasesState();
+  State<DoctorAvailableCases> createState() => _DoctorAvailableCasesState();
 }
 
-class _MyCasesState extends State<MyCases> {
-  UserModel? user;
+class _DoctorAvailableCasesState extends State<DoctorAvailableCases> {
+  StudentUser? user;
   var authService = AuthService();
   bool loading = false;
   List<Case> patientCases = []; // ✅ initialize empty
@@ -38,8 +36,7 @@ class _MyCasesState extends State<MyCases> {
 
   Future<void> _fetchUser() async {
     try {
-      user = await authService.getUserProfile();
-      print("user is ${user?.name ?? 'null'}");
+      user = await authService.getStudentProfile();
     } catch (e) {
       print("Error fetching user: $e");
     }
@@ -51,18 +48,20 @@ class _MyCasesState extends State<MyCases> {
     try {
       QuerySnapshot snapshot;
       try {
-        // Try with orderBy first
+        // Fetch all pending cases (available for booking)
         snapshot = await FirebaseFirestore.instance
             .collection('cases')
-            .where('patientId', isEqualTo: user!.uid)
+            .where('state', isEqualTo: CaseState.pending.name)
             .orderBy('createdAt', descending: true)
             .get();
+        print("fetched with order ${snapshot.docs.length} cases");
+
       } catch (e) {
         // If orderBy fails (no index), fetch without ordering
         print('OrderBy failed, fetching without order: $e');
         snapshot = await FirebaseFirestore.instance
             .collection('cases')
-            .where('patientId', isEqualTo: user!.uid)
+            .where('state', isEqualTo: CaseState.pending.name)
             .get();
       }
 
@@ -90,86 +89,6 @@ class _MyCasesState extends State<MyCases> {
       print('Error fetching cases: $e');
       patientCases = [];
     }
-  }
-
-  Future<void> _deleteCase(Case caseItem) async {
-    if (caseItem.documentId == null) {
-      if (mounted) {
-        context.showErrorSnackBar(
-          'Cannot delete: Case ID not found',
-          Colors.red,
-        );
-      }
-      return;
-    }
-
-    // Show confirmation dialog
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel Case'),
-        content: const Text(
-          'Are you sure you want to cancel this case? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Yes, Cancel'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('cases')
-          .doc(caseItem.documentId)
-          .delete();
-
-      if (!mounted) return;
-
-      context.showErrorSnackBar('Case cancelled successfully', Colors.green);
-
-      // Refresh the list
-      await _fetchCases();
-      if (mounted) {
-        setState(() {});
-      }
-    } catch (e) {
-      if (!mounted) return;
-      context.showErrorSnackBar(
-        'Error cancelling case: ${e.toString()}',
-        Colors.red,
-      );
-    }
-  }
-
-  void _editCase(Case caseItem) {
-    if (caseItem.documentId == null) {
-      context.showErrorSnackBar('Cannot edit: Case ID not found', Colors.red);
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            EditCasePage(caseId: caseItem.documentId!, existingCase: caseItem),
-      ),
-    ).then((_) async {
-      // Refresh cases after editing
-      await _fetchCases();
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
   @override
@@ -200,26 +119,16 @@ class _MyCasesState extends State<MyCases> {
         ),
       );
     }
-    //if the cases are empty
-    if (patientCases.isEmpty) {
-      return Scaffold(
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await _fetchCases();
-            setState(() {});
-          },
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: const [
-              SizedBox(height: 300),
-              Center(
-                child: Text('No cases found', style: TextStyle(fontSize: 16)),
-              ),
-            ],
-          ),
-        ),
-      );
+    
+    Future<void> _bookCase(Case caseItem) async {
+      print("case booked");
     }
+
+    if (patientCases.isEmpty) {
+      return const Scaffold(body: Center(child: Text('No cases found')));
+    }
+
+
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Cases')),
@@ -234,10 +143,7 @@ class _MyCasesState extends State<MyCases> {
             final caseItem = patientCases[index];
             return CaseCard(
               caseItem: caseItem,
-              onEdit: caseItem.state == CaseState.pending
-                  ? () => _editCase(caseItem)
-                  : null,
-              onDelete: () => _deleteCase(caseItem),
+              onBook: () => _bookCase(caseItem),
             );
           },
         ),

@@ -4,9 +4,11 @@ import '../models/case.dart';
 class CaseCard extends StatelessWidget {
   final Case caseItem;
   final VoidCallback? onEdit;
+  final VoidCallback? onBook;
   final VoidCallback? onDelete;
 
   const CaseCard({
+    this.onBook,
     super.key,
     required this.caseItem,
     this.onEdit,
@@ -18,18 +20,16 @@ class CaseCard extends StatelessWidget {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           /// 1️⃣ Case image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: caseItem.imageUrl.isNotEmpty && 
-                   caseItem.imageUrl != 'placeholder_url'
+            child:
+                caseItem.imageUrl.isNotEmpty &&
+                    caseItem.imageUrl != 'placeholder_url'
                 ? Image.network(
                     caseItem.imageUrl,
                     height: 180,
@@ -49,9 +49,7 @@ class CaseCard extends StatelessWidget {
                       return Container(
                         height: 180,
                         color: Colors.grey.shade200,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const Center(child: CircularProgressIndicator()),
                       );
                     },
                   )
@@ -70,7 +68,6 @@ class CaseCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 /// Type + Status
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,10 +95,7 @@ class CaseCard extends StatelessWidget {
                 if (caseItem.description != null)
                   Text(
                     caseItem.description!,
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
                   ),
 
                 const SizedBox(height: 14),
@@ -128,12 +122,12 @@ class CaseCard extends StatelessWidget {
                 ),
 
                 /// Action buttons (only for pending cases)
-                if (caseItem.state == CaseState.pending && 
-                    (onEdit != null || onDelete != null))
-                  ...[
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 8),
+                if (caseItem.state == CaseState.pending &&
+                    (onEdit != null || onDelete != null || onBook != null)) ...[
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  if (onEdit != null || onDelete != null)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -153,7 +147,19 @@ class CaseCard extends StatelessWidget {
                           ),
                       ],
                     ),
+                  if (onBook != null) ...[
+                    if (onEdit != null || onDelete != null)
+                      const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton.icon(
+                        onPressed: onBook,
+                        icon: const Icon(Icons.bookmark, size: 18),
+                        label: const Text("Book Case"),
+                      ),
+                    ),
                   ],
+                ],
               ],
             ),
           ),
